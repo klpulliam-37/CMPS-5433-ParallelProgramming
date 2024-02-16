@@ -1,3 +1,6 @@
+// Garrett Mathers & Kolten Pulliam
+// mpicc KoltenPulliamParallelV1.c -o mycodepar
+
 #include <stdio.h>
 #include <mpi.h>
 

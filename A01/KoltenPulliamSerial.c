@@ -1,3 +1,6 @@
+// Garrett Mathers & Kolten Pulliam
+// mpicc KoltenPulliamSerial.c -o mycodeseq
+
 #include <stdio.h>
 #include <time.h>
 
