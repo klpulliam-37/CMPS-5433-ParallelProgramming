@@ -8,7 +8,7 @@ int sum(int array[]);
 int main(void) {
     int my_rank, comm_sz, local_n;
     int local_start, local_end;
-    unsigned long long local_sum;
+    unsigned long long local_sum = 0;
     int source;
     double start_time, end_time, total_time;
 
