@@ -8,10 +8,10 @@
 // DFT given a sample set of 16384 values.
 //
 // To compile the program:
-// mpicc Pulliam_Mathers_MPIVer_16384.c -o Ver_16384 -lm
+// mpicc Pulliam_Mathers_MPIVer_16384.c -o MPIVer_16384 -lm
 //
 // To run the program without the script file (locally):
-// mpiexec -n <number-of-processes> ./Ver_16384
+// mpiexec -n <number-of-processes> ./MPIVer_16384
 // 
 // To run the program with the script file on frontera:
 // sbatch FronteraScriptMPIVer16384

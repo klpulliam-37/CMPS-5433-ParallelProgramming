@@ -8,10 +8,10 @@
 // DFT given a sample set of 1024 values.
 //
 // To compile the program:
-// mpicc Pulliam_Mathers_MPIVer_1024.c -o Ver_1024 -lm
+// mpicc Pulliam_Mathers_MPIVer_1024.c -o MPIVer_1024 -lm
 //
 // To run the program without the script file (locally):
-// mpiexec -n <number-of-processes> ./Ver_1024
+// mpiexec -n <number-of-processes> ./MPIVer_1024
 // 
 // To run the program with the script file on frontera:
 // sbatch FronteraScriptMPIVer1024
