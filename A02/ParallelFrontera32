@@ -28,7 +28,7 @@
 #SBATCH -e parallel.e%j       # Name of stderr error file
 #SBATCH -p development          # Queue (partition) name
 #SBATCH -N 4               # Total # of nodes
-#SBATCH -n 64              # Total # of mpi tasks
+#SBATCH -n 32              # Total # of mpi tasks
 #SBATCH -t 01:30:00        # Run time (hh:mm:ss)
 #SBATCH --mail-type=all    # Send email at begin and end of job
 #SBATCH -A ASC23018       # Project/Allocation name (req'd if you have more than 1)
@@ -40,4 +40,4 @@ pwd
 date
 
 # Launch MPI code...
-ibrun ./mycodepar        # Use ibrun instead of mpirun or mpiexec
+ibrun ./littleparallel        # Use ibrun instead of mpirun or mpiexec
