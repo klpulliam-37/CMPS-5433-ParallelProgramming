@@ -1,20 +1,20 @@
 //**************************************************************
 // Assignment #2
 // Name: Kolten Pulliam and Garrett Mathers
-// Parallel Programming Date: 03/28/2024
+// Parallel Programming Date: 03/29/2024
 //***************************************************************
-// Place your general program documentation here. It should
-// be quite a few lines explaining the programs duty carefully.
-// It should also indicate how to run the program and data
-// input format, filenames etc
+// This program demonstrates an implementation of the Cooley-Tukey
+// FFT algorithm calculating the DFT given a sample set of 1024 values.
+//
+// To compile the program:
+// mpicc Pulliam_Mathers_SeqVer.c -o SeqVer -lm
+//
+// To run the program without the script file (locally):
+// mpiexec -n <number-of-processes> ./SeqVer
+// 
+// To run the program with the script file on frontera:
+// sbatch FronteraScriptMPIVer1024
 //*****************************************************************
-//*******************************************************************
-// FOR ALL FUNCTIONS 
-// function Name::MethodName()
-// Parameters: List them here and comment
-// A discussion of what the method/function does and required
-// parameters as well as return value.
-//********************************************************************
 
 
 #include <stdio.h>
@@ -23,7 +23,7 @@
 #include <time.h>
 
 #define PI 3.14159265358979323846
-#define N 16384 // Assuming N is a power of 2 for simplicity
+#define N 1024 // Assuming N is a power of 2 for simplicity
 
 // Complex number structure
 struct Complex {
@@ -31,7 +31,15 @@ struct Complex {
     double imag;
 };
 
-// Function to compute the FFT
+//*******************************************************************
+// fft
+// Parameters: 
+// - struct Complex* samples -> Array of complex numbers
+// - int n -> the number of elements in the array
+// This function performs the Cooley-Tukey algorithm on an array of
+// complex numbers, and returns nothing as the samples array is 
+// passed by pointer.
+//********************************************************************
 void fft(struct Complex* samples, int n) {
     if (n <= 1) return;
 
@@ -50,7 +58,7 @@ void fft(struct Complex* samples, int n) {
     for (int k = 0; k < n / 2; k++) {
         // Compute the twiddle factor
         double angle = -2 * PI * k / n;
-        struct Complex t = {cos(angle), sin(angle)}; // Twiddle factor
+        struct Complex t = {cos(angle), sin(angle)};
 
         // Apply the butterfly operation
         struct Complex tmp = {t.real * odd[k].real - t.imag * odd[k].imag,
@@ -63,6 +71,16 @@ void fft(struct Complex* samples, int n) {
     }
 }
 
+//*******************************************************************
+// createSamples
+// Parameters: 
+// - int n -> the number of elements to be created
+// This function creates an array of structs that represent the 
+// complex numbers. It initializes the first eight values according 
+// to the table provided in the instructions, and all other values 
+// are initialized to zero. This function returns a pointer to the
+// struct Complex array.
+//********************************************************************
 struct Complex* createSamples(int n) {
     // Allocate memory for the array of complex numbers
     struct Complex *samples = (struct Complex *)calloc(n, sizeof(struct Complex));
@@ -112,10 +130,10 @@ int main() {
             shouldPrint = 0;
         }
 
-        printf("Time spent: %.6f\n", time_spent_ms);
-
         free(samples);
     }
+
+    // Calculate average time
     double average_time = sum / 3;
     printf("Average time (milliseconds): %.6f\n", average_time);
     
