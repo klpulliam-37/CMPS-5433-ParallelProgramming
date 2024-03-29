@@ -5,18 +5,17 @@
 //***************************************************************
 // This program demonstrates an implementation of the Cooley-Tukey
 // FFT algorithm using MPI to split the workload of calculating the 
-// DFT.
-// It should also indicate how to run the program and data
-// input format, filenames etc
+// DFT given a sample set of 16384 values.
+//
+// To compile the program:
+// mpicc Pulliam_Mathers_MPIVer_16384.c -o Ver_16384 -lm
+//
+// To run the program without the script file (locally):
+// mpiexec -n <number-of-processes> ./Ver_16384
+// 
+// To run the program with the script file on frontera:
+// sbatch FronteraScriptMPIVer16384
 //*****************************************************************
-//*******************************************************************
-// FOR ALL FUNCTIONS 
-// function Name::MethodName()
-// Parameters: List them here and comment
-// A discussion of what the method/function does and required
-// parameters as well as return value.
-//********************************************************************
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,15 +23,23 @@
 #include <mpi.h>
 
 #define PI 3.14159265358979323846
-#define N 16384 // Assuming N is a power of 2 for simplicity
+#define N 16384
 
-// Complex number structure
+// Complex number struct
 struct Complex {
     double real;
     double imag;
 };
 
-// Function to compute the FFT
+//*******************************************************************
+// fft
+// Parameters: 
+// - struct Complex* samples -> Array of complex numbers
+// - int n -> the number of elements in the array
+// This function performs the Cooley-Tukey algorithm on an array of
+// complex numbers, and returns nothing as the samples array is 
+// passed by pointer.
+//********************************************************************
 void fft(struct Complex* samples, int n) {
     if (n <= 1) return;
 
@@ -64,6 +71,16 @@ void fft(struct Complex* samples, int n) {
     }
 }
 
+//*******************************************************************
+// createSamples
+// Parameters: 
+// - int n -> the number of elements to be created
+// This function creates an array of structs that represent the 
+// complex numbers. It initializes the first eight values according 
+// to the table provided in the instructions, and all other values 
+// are initialized to zero. This function returns a pointer to the
+// struct Complex array.
+//********************************************************************
 struct Complex* createSamples(int n) {
     // Allocate memory for the array of complex numbers
     struct Complex *samples = (struct Complex *)calloc(n, sizeof(struct Complex));

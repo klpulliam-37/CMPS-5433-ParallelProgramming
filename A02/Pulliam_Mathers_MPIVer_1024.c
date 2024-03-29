@@ -1,21 +1,21 @@
 //**************************************************************
 // Assignment #2
 // Name: Kolten Pulliam and Garrett Mathers
-// Parallel Programming Date: 03/28/2024
+// Parallel Programming Date: 03/29/2024
 //***************************************************************
-// Place your general program documentation here. It should
-// be quite a few lines explaining the programs duty carefully.
-// It should also indicate how to run the program and data
-// input format, filenames etc
+// This program demonstrates an implementation of the Cooley-Tukey
+// FFT algorithm using MPI to split the workload of calculating the 
+// DFT given a sample set of 1024 values.
+//
+// To compile the program:
+// mpicc Pulliam_Mathers_MPIVer_1024.c -o Ver_1024 -lm
+//
+// To run the program without the script file (locally):
+// mpiexec -n <number-of-processes> ./Ver_1024
+// 
+// To run the program with the script file on frontera:
+// sbatch FronteraScriptMPIVer1024
 //*****************************************************************
-//*******************************************************************
-// FOR ALL FUNCTIONS 
-// function Name::MethodName()
-// Parameters: List them here and comment
-// A discussion of what the method/function does and required
-// parameters as well as return value.
-//********************************************************************
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,15 +23,23 @@
 #include <mpi.h>
 
 #define PI 3.14159265358979323846
-#define N 1024 // Assuming N is a power of 2 for simplicity
+#define N 1024
 
-// Complex number structure
+// Complex number struct
 struct Complex {
     double real;
     double imag;
 };
 
-// Function to compute the FFT
+//*******************************************************************
+// fft
+// Parameters: 
+// - struct Complex* samples -> Array of complex numbers
+// - int n -> the number of elements in the array
+// This function performs the Cooley-Tukey algorithm on an array of
+// complex numbers, and returns nothing as the samples array is 
+// passed by pointer.
+//********************************************************************
 void fft(struct Complex* samples, int n) {
     if (n <= 1) return;
 
@@ -50,7 +58,7 @@ void fft(struct Complex* samples, int n) {
     for (int k = 0; k < n / 2; k++) {
         // Compute the twiddle factor
         double angle = -2 * PI * k / n;
-        struct Complex t = {cos(angle), sin(angle)}; // Twiddle factor
+        struct Complex t = {cos(angle), sin(angle)};
 
         // Apply the butterfly operation
         struct Complex tmp = {t.real * odd[k].real - t.imag * odd[k].imag,
@@ -63,12 +71,21 @@ void fft(struct Complex* samples, int n) {
     }
 }
 
+//*******************************************************************
+// createSamples
+// Parameters: 
+// - int n -> the number of elements to be created
+// This function creates an array of structs that represent the 
+// complex numbers. It initializes the first eight values according 
+// to the table provided in the instructions, and all other values 
+// are initialized to zero. This function returns a pointer to the
+// struct Complex array.
+//********************************************************************
 struct Complex* createSamples(int n) {
     // Allocate memory for the array of complex numbers
     struct Complex *samples = (struct Complex *)calloc(n, sizeof(struct Complex));
 
     // Initialize the first 8 values
-    // Example values, adjust as needed
     samples[0] = (struct Complex){3.6, 2.6};
     samples[1] = (struct Complex){2.9, 6.3};
     samples[2] = (struct Complex){5.6, 4};
@@ -81,17 +98,16 @@ struct Complex* createSamples(int n) {
     return samples;
 }
 
-// Main function to demonstrate the FFT function
 int main() {
     double sum = 0.f;
     int shouldPrint = 1;
 
     int rank, size;
-    MPI_Init(NULL, NULL); // Initialize MPI environment
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank); // Get the rank of the process
-    MPI_Comm_size(MPI_COMM_WORLD, &size); // Get the number of processes
+    MPI_Init(NULL, NULL);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    // Create a datatype for the Complex struct
+    // Create a datatype for the Complex struct to pass through MPI_Scatter/Gather
     MPI_Datatype ComplexType;
     MPI_Type_contiguous(2, MPI_DOUBLE, &ComplexType);
     MPI_Type_commit(&ComplexType);
@@ -99,17 +115,17 @@ int main() {
     // Calculate the number of elements to send to each process
     int local_n = N / size;
 
-    // Calculate average time of execution
+    // Calculate average time of execution across three runs
     for (int itr = 0; itr < 3; itr++) {
-        
         struct Complex *samples;
         if (rank == 0) {
             samples = createSamples(N); // Root process creates the full sample array
         }
 
+        // Create an array of complex number structs based on local_n size
         struct Complex *local_samples = (struct Complex *)malloc(local_n * sizeof(struct Complex));
 
-        // Send out portions of array
+        // Start the timer
         double start_time = MPI_Wtime();
 
         // Distribute parts of the array to all processes
@@ -118,10 +134,11 @@ int main() {
         // Each process performs FFT on its portion of the data
         fft(local_samples, local_n);
 
-        // Gather the processed parts back to the root process
+        // Gather the sub arrays back to process zero
         MPI_Gather(local_samples, local_n, ComplexType, samples, local_n, ComplexType, 0, MPI_COMM_WORLD);
         double end_time = MPI_Wtime();
 
+        // Calculate time spent
         double total_time = end_time - start_time;
         double total_time_ms = (total_time * 1000);
         sum += total_time_ms;
@@ -135,14 +152,15 @@ int main() {
                     printf("XR[%d]: %.6f    XI[%d]: %.6f\n", i, samples[i].real, i, samples[i].imag);
                     printf("================================\n");
                 }
-                free(samples);
 
-                printf("Time spent calculating FFT: %.6f\n", total_time_ms);
+                // Free memory allocated by process 0
+                free(samples);
             }
 
             shouldPrint = 0;
         }
 
+        // Free memory for local_sample allocated by each process
         free(local_samples);
     }
 
