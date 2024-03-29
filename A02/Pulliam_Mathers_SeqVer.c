@@ -7,13 +7,13 @@
 // FFT algorithm calculating the DFT given a sample set of 1024 values.
 //
 // To compile the program:
-// mpicc Pulliam_Mathers_SeqVer.c -o SeqVer -lm
+// mpicc Pulliam_Mathers_SeqVer.c -o mycodeseq -lm
 //
 // To run the program without the script file (locally):
-// mpiexec -n <number-of-processes> ./SeqVer
+// mpiexec -n <number-of-processes> ./mycodeseq
 // 
 // To run the program with the script file on frontera:
-// sbatch FronteraScriptMPIVer1024
+// sbatch SequentialFrontera
 //*****************************************************************
 
 
