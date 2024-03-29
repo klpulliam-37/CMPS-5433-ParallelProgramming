@@ -1,10 +1,11 @@
 //**************************************************************
 // Assignment #2
 // Name: Kolten Pulliam and Garrett Mathers
-// Parallel Programming Date: 03/28/2024
+// Parallel Programming Date: 03/29/2024
 //***************************************************************
-// Place your general program documentation here. It should
-// be quite a few lines explaining the programs duty carefully.
+// This program demonstrates an implementation of the Cooley-Tukey
+// FFT algorithm using MPI to split the workload of calculating the 
+// DFT.
 // It should also indicate how to run the program and data
 // input format, filenames etc
 //*****************************************************************
@@ -50,7 +51,7 @@ void fft(struct Complex* samples, int n) {
     for (int k = 0; k < n / 2; k++) {
         // Compute the twiddle factor
         double angle = -2 * PI * k / n;
-        struct Complex t = {cos(angle), sin(angle)}; // Twiddle factor
+        struct Complex t = {cos(angle), sin(angle)};
 
         // Apply the butterfly operation
         struct Complex tmp = {t.real * odd[k].real - t.imag * odd[k].imag,
@@ -68,7 +69,6 @@ struct Complex* createSamples(int n) {
     struct Complex *samples = (struct Complex *)calloc(n, sizeof(struct Complex));
 
     // Initialize the first 8 values
-    // Example values, adjust as needed
     samples[0] = (struct Complex){3.6, 2.6};
     samples[1] = (struct Complex){2.9, 6.3};
     samples[2] = (struct Complex){5.6, 4};
