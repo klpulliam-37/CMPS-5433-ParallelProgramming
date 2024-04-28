@@ -1,0 +1,4 @@
+[ZoneTransfer]
+ZoneId=3
+ReferrerUrl=https://cloudconvert.com/
+HostUrl=https://eu-central.storage.cloudconvert.com/tasks/efbbf20b-0f46-47fe-bd60-c90e41a5a6e9/fog_mountains.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=cloudconvert-production%2F20240428%2Ffra%2Fs3%2Faws4_request&X-Amz-Date=20240428T233852Z&X-Amz-Expires=86400&X-Amz-Signature=60f73fec4ad09777bd766723519d70aca3d27ed94f1944222bbe1bf5bcea16e4&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22fog_mountains.png%22&response-content-type=image%2Fpng&x-id=GetObject
