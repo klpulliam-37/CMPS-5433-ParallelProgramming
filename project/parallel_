@@ -45,4 +45,4 @@ date
 export OMP_NUM_THREADS=4   # this is 1 thread/core; may want to start lower
 
 # Launch OpenMP code...
-./myprogram         # Do not use ibrun or any other MPI launcher
+./parallel         # Do not use ibrun or any other MPI launcher
