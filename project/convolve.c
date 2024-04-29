@@ -101,35 +101,47 @@ void write_png_file(char *filename, png_bytep *rows, int width, int height, png_
 void *apply_convolution(void *arg) {
     ThreadData *data = (ThreadData *)arg;
     
-    int kernel[3][3] = {
-        {1/9, 1/9, 1/9},
-        {1/9, 1/9, 1/9},
-        {1/9, 1/9, 1/9}
-    };
+    // int kernel[3][3] = {
+    //     {1/3, 1/3, 1/3},
+    //     {1/3, 1/3, 1/3},
+    //     {1/3, 1/3, 1/3}
+    // };
 
-    int sumKernel = 9; // Sum of the kernel for normalization
+    // int sumKernel = 9; // Sum of the kernel for normalization
+
+    float kernel[5][5] = {
+        {1/25, 1/25, 1/25, 1/25, 1/25},
+        {1/25, 1/25, 1/25, 1/25, 4/25},
+        {1/25, 1/25, 1/25, 1/25, 1/25},
+        {1/25, 1/25, 1/25, 1/25, 1/25},
+        {1/25, 1/25, 1/25, 1/25, 1/25}
+    };
+    int sumKernel = 625; // Sum of all weights in the kernel
+
+    int kCenter = 5 / 2;
 
     for (int y = data->start_row; y < data->end_row; y++) {
-        for (int x = 0; x < data->width; x++) {
-            int sumR = 0, sumG = 0, sumB = 0;
-            for (int ky = -1; ky <= 1; ky++) {
-                for (int kx = -1; kx <= 1; kx++) {
-                    int posY = y + ky;
-                    int posX = x + kx;
-                    if (posX >= 0 && posX < data->width && posY >= 0 && posY < data->height) {
-                        png_byte* pixel = &(data->rows[posY][posX * 3]);
-                        sumR += pixel[0];
-                        sumG += pixel[1];
-                        sumB += pixel[2];
-                    }
+    for (int x = 0; x < data->width; x++) {
+        float sumR = 0, sumG = 0, sumB = 0;
+        for (int ky = -kCenter; ky <= kCenter; ky++) {
+            for (int kx = -kCenter; kx <= kCenter; kx++) {
+                int posY = y + ky;
+                int posX = x + kx;
+                if (posX >= 0 && posX < data->width && posY >= 0 && posY < data->height) {
+                    png_byte* pixel = &(data->rows[posY][posX * 3]);
+                    float weight = kernel[ky + kCenter][kx + kCenter];
+                    sumR += pixel[0] * weight;
+                    sumG += pixel[1] * weight;
+                    sumB += pixel[2] * weight;
                 }
             }
-            png_byte* newPixel = &(data->new_rows[y][x * 3]);
-            newPixel[0] = sumR / sumKernel;
-            newPixel[1] = sumG / sumKernel;
-            newPixel[2] = sumB / sumKernel;
         }
+        png_byte* newPixel = &(data->new_rows[y][x * 3]);
+        newPixel[0] = (png_byte)(sumR); // Normalize if necessary
+        newPixel[1] = (png_byte)(sumG);
+        newPixel[2] = (png_byte)(sumB);
     }
+}
 
     pthread_exit(NULL);
 
