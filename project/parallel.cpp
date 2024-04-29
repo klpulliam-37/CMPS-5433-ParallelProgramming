@@ -10,7 +10,7 @@
 #include <pthread.h>
 
 // Number of threads
-#define P 4
+#define P 2
 
 bitmap_image image = bitmap_image("images/MARBLES.bmp");
 bitmap_image out;

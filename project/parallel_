@@ -42,7 +42,7 @@ pwd
 date
 
 # Set thread count (default value is 1)...
-export OMP_NUM_THREADS=4   # this is 1 thread/core; may want to start lower
+export OMP_NUM_THREADS=16   # this is 1 thread/core; may want to start lower
 
 # Launch OpenMP code...
 ./parallel         # Do not use ibrun or any other MPI launcher
